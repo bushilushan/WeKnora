@@ -59,19 +59,6 @@ func main() {
 		tracer *tracing.Tracer,
 		resourceCleaner interfaces.ResourceCleaner,
 	) error {
-		// Create context for resource cleanup
-		shutdownTimeout := cfg.Server.ShutdownTimeout
-		if shutdownTimeout == 0 {
-			shutdownTimeout = 30 * time.Second
-		}
-		cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), shutdownTimeout)
-		defer cleanupCancel()
-
-		// Register tracer cleanup function to resource cleaner
-		resourceCleaner.RegisterWithName("Tracer", func() error {
-			return tracer.Cleanup(cleanupCtx)
-		})
-
 		// Create HTTP server
 		server := &http.Server{
 			Addr:    fmt.Sprintf("%s:%d", cfg.Server.Host, cfg.Server.Port),
@@ -85,13 +72,26 @@ func main() {
 			sig := <-signals
 			logger.Infof(context.Background(), "Received signal: %v, starting server shutdown...", sig)
 
+			shutdownTimeout := cfg.Server.ShutdownTimeout
+			if shutdownTimeout == 0 {
+				shutdownTimeout = 30 * time.Second
+			}
+
 			// Create a context with timeout for server shutdown
-			shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 30*time.Second)
+			shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), shutdownTimeout)
 			defer shutdownCancel()
 
 			if err := server.Shutdown(shutdownCtx); err != nil {
 				logger.Fatalf(context.Background(), "Server forced to shutdown: %v", err)
 			}
+
+			cleanupCtx, cleanupCancel := context.WithTimeout(context.Background(), 30*time.Second)
+			defer cleanupCancel()
+
+			// Register tracer cleanup function to resource cleaner
+			resourceCleaner.RegisterWithName("Tracer", func() error {
+				return tracer.Cleanup(cleanupCtx)
+			})
 
 			// Clean up all registered resources
 			logger.Info(context.Background(), "Cleaning up resources...")

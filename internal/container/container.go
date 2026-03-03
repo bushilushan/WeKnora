@@ -76,7 +76,8 @@ func BuildContainer(container *dig.Container) *dig.Container {
 	logger.Debugf(ctx, "[Container] Starting container initialization...")
 
 	// Register resource cleaner for proper cleanup of resources
-	must(container.Provide(NewResourceCleaner, dig.As(new(interfaces.ResourceCleaner))))
+	// must(container.Provide(NewResourceCleaner, dig.As(new(interfaces.ResourceCleaner))))
+	must(container.Provide(NewResourceCleaner))
 
 	// Core infrastructure configuration
 	logger.Debugf(ctx, "[Container] Registering core infrastructure...")

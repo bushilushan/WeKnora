@@ -77,8 +77,9 @@ else
 endif
 
 # Build the application
+# google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn for qdrant milvus proto conflict
 build:
-	go build -o $(BINARY_NAME) $(MAIN_PATH)
+	go build -ldflags="-X 'google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn'" -o $(BINARY_NAME) $(MAIN_PATH)
 
 # Run the application
 run: build

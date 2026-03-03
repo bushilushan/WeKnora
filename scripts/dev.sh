@@ -252,7 +252,8 @@ start_app() {
     fi
     
     # 设置本地开发环境变量（覆盖 Docker 容器地址）
-    export DB_HOST=localhost
+    export DB_HOST=${DB_HOST:-localhost}
+    export DB_PORT=${DB_PORT:-5432}
     export DOCREADER_ADDR=localhost:50051
     export DOCREADER_TRANSPORT=grpc
     export MINIO_ENDPOINT=localhost:9000
