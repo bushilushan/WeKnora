@@ -221,20 +221,11 @@ deps:
 
 # Build for production
 # google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn for qdrant milvus proto conflict
-UNAME_S := $(shell uname -s)
-
-ifeq ($(UNAME_S),Darwin)
-    CGO_LDFLAGS_EXTRA := -no_warn_duplicate_libraries
-else
-    CGO_LDFLAGS_EXTRA :=
-endif
-
 build-prod:
 	VERSION=$$(git describe --tags --abbrev=0 2>/dev/null || echo "$${VERSION:-unknown}"); \
 	COMMIT_ID=$${COMMIT_ID:-unknown}; \
 	CGO_ENABLED=1 \
 	CGO_CFLAGS="-Wno-deprecated-declarations" \
-	CGO_LDFLAGS="$(CGO_LDFLAGS_EXTRA)" \
 	BUILD_TIME=$${BUILD_TIME:-unknown}; \
 	GO_VERSION=$${GO_VERSION:-unknown}; \
 	LDFLAGS="-X 'github.com/Tencent/WeKnora/internal/handler.Version=$$VERSION' -X 'github.com/Tencent/WeKnora/internal/handler.Edition=standard' -X 'github.com/Tencent/WeKnora/internal/handler.CommitID=$$COMMIT_ID' -X 'github.com/Tencent/WeKnora/internal/handler.BuildTime=$$BUILD_TIME' -X 'github.com/Tencent/WeKnora/internal/handler.GoVersion=$$GO_VERSION' -X 'google.golang.org/protobuf/reflect/protoregistry.conflictPolicy=warn'"; \

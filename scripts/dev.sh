@@ -252,8 +252,8 @@ start_app() {
     fi
     
     # 设置本地开发环境变量（覆盖 Docker 容器地址）
-    export DB_HOST=${DB_HOST:-localhost}
-    export DB_PORT=${DB_PORT:-5432}
+    export DB_HOST=localhost
+    export DB_PORT=5432
     export DOCREADER_ADDR=localhost:50051
     export DOCREADER_TRANSPORT=grpc
     export MINIO_ENDPOINT=localhost:9000
@@ -272,9 +272,6 @@ start_app() {
     log_info "数据库地址: $DB_HOST:${DB_PORT:-5432}"
     
     export CGO_CFLAGS="-Wno-deprecated-declarations -Wno-gnu-folding-constant"
-    if [ "$(uname)" = "Darwin" ]; then
-        export CGO_LDFLAGS="-no_warn_duplicate_libraries"
-    fi
 
     # 检查是否安装了 Air（热重载工具）
     if command -v air &> /dev/null; then
